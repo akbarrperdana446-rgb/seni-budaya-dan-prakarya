@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Pembelajaran Seni Budaya dan Prakarya di SD</title>
+    <style>
+        :root {
+            --primary: #0284C7;
+            --primary-hover: #0369A1;
+            --bg-color: #F0F9FF;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --correct: #059669;
+            --wrong: #DC2626;
+            --border: #E0F2FE;
+            --option-letter: #EF4444; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            margin: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #F8FAFC;
+            border-bottom: 2px solid var(--border);
+            font-weight: bold;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .content {
+            padding: 35px 30px;
+        }
+
+        .question {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        /* Tambahan styling agar gambar di soal rapi */
+        .question img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.05rem;
+            background-color: white;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary);
+            background-color: #F0F9FF;
+        }
+
+        .option-item input {
+            margin-top: 5px;
+            margin-right: 15px;
+            transform: scale(1.3);
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .option-letter {
+            color: var(--option-letter);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .option-item.correct {
+            border-color: var(--correct);
+            background-color: #ECFDF5;
+        }
+
+        .option-item.wrong {
+            border-color: var(--wrong);
+            background-color: #FEF2F2;
+        }
+
+        .feedback-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .feedback-box.success {
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid var(--correct);
+        }
+
+        .feedback-box.error {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid var(--wrong);
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background-color: #F8FAFC;
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: #E0F2FE;
+        }
+
+        .btn-check {
+            background-color: #F59E0B;
+            color: white;
+            flex-grow: 1;
+        }
+
+        .btn-check:hover:not(:disabled) {
+            background-color: #D97706;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 650px) {
+            .controls {
+                flex-direction: column;
+            }
+            .btn-check {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <div class="header">
+            <h1>Kuis SPGK4306 Pembelajaran Seni Budaya & Prakarya</h1>
+        </div>
+        
+        <div class="status-bar">
+            <span id="tracker">Soal 1 dari ...</span>
+            <span id="score">Skor: 0</span>
+        </div>
+
+        <div class="content">
+            <div id="question" class="question">Memuat soal...</div>
+            <div id="options" class="options"></div>
+            <div id="feedback" class="feedback-box"></div>
+        </div>
+
+        <div class="controls">
+            <button id="btn-prev" class="btn btn-outline">Sebelumnya</button>
+            <button id="btn-check" class="btn btn-check">Cek Jawaban</button>
+            <button id="btn-next" class="btn btn-primary">Selanjutnya</button>
+        </div>
+    </div>
+
+    <script>
+        // Database Soal dari dokumen PDF SPGK4306.
+        const quizData = [
+            { q: "1. Kurikulum yang satu ini dirancang untuk mengembangkan kepribadian siswa sesuai dengan harkat dan martabat kemanusiaannya. Selain itu kurikulum ini lebih menekankan pada pembangunan watak dan kepribadian siswa sebagai manusia sosial dan beragama. Kurikulum yang dimaksud adalah...", opts: { A: "practical curriculum", B: "academic curriculum", C: "cultural curriculum", D: "general curriculum" }, ans: "C" },
+            { q: "2. Pendekatan yang digunakan sebagai strategi dalam pembelajaran teori atau apresiasi yang bersifat kognitif adalah...", opts: { A: "Definitif", B: "Partisipatif", C: "Eksploratif", D: "Tematis" }, ans: "A" },
+            { q: "3. <br><img src='https://drive.google.com/thumbnail?id=1b77MDquTXqeC5ngQoY2zXx86eD61Nc0B&sz=w1000' alt='Gambar Pola ritmik'><br>Pola ritmik (irama) di atas berbirama...",  opts: { A: "2/8", B: "2/4", C: "3/4", D: "4/4" }, ans: "C" },
+            { q: "4. Di bawah ini adalah arppegio... <br><img src='https://drive.google.com/thumbnail?id=1pwB2MmD2QnLPLBqUjSmJPBqmavYScWJj&sz=w1000' alt='Gambar Arppegio'>", opts: { A: "Gambar A", B: "Gambar B", C: "Gambar C", D: "Gambar D" }, ans: "A" },
+            { q: "5. Gerak tari yang cocok untuk anak-anak adalah gerak...", opts: { A: "artistik", B: "tradisional", C: "murni", D: "maknawi" }, ans: "C" },
+            { q: "6. Berikut ini adalah salah satu yang tidak masuk pada prinsip-prinsip dalam memanfaatkan teknologi terapan dalam penciptaan karya seni...", opts: { A: "ekonomi", B: "kekuasaan", C: "kecepatan", D: "higienis" }, ans: "B" },
+            { q: "7. Gambar ilustrasi sangat berguna bagi anak-anak SD karena ....", opts: { A: "memperjelas isi buku", B: "memperindah isi buku", C: "menambah wawasan", D: "menyenangkan" }, ans: "A" },
+            { q: "8. Anak sudah mampu mengekspresikan bentuk-bentuk ekspresi yang spontan, lugas, dan jujur merupakan salah satu karakteristik...", opts: { A: "estetika", B: "kognitif", C: "emosional", D: "perseptual" }, ans: "C" },
+            { q: "9. Melalui kegiatan pembelajaran seni di SD siswa diberikan tugas mengoleksi tampilan gambar, lukisan, kerajinan tangan yang dipilih dari majalah dan surat kabar. Aktivitas seni tersebut termasuk tahapan apresiasi dalam...", opts: { A: "berkarya seni", B: "pengamatan dan penghayatan seni", C: "pengakrapan hasil karya seni", D: "pengenalan jenis karya seni" }, ans: "B" },
+            { q: "10. Suatu garapan tari yang pengungkapannya tidak diekspresikan secara jelas adalah tipe tari...", opts: { A: "dramatik", B: "dramatari", C: "abstrak", D: "komedi" }, ans: "C" },
+            { q: "11. Koreografer adalah sebutan seorang seniman yang profesinya...", opts: { A: "mencipta dan mengatur tari", B: "memimpin pertunjukan drama", C: "mengarang lagu", D: "membuat drama" }, ans: "A" },
+            { q: "12. Penggambaran sebuah cerita yang lengkap terlihat dari gambar anak pada masa...", opts: { A: "realisme semu", B: "realisme awal", C: "coreng moreng", D: "prabagan" }, ans: "A" },
+            { q: "13. Yang bukan termasuk dalam manfaat seni secara langsung antara lain seperti berikut ini...", opts: { A: "ekspresi", B: "estetika", C: "bermain", D: "komunikasi" }, ans: "C" },
+            { q: "14. Berikut ini adalah merupakan unsur-unsur pokok seni tari. Unsur-unsur yang dimaksudkan antara lain ....", opts: { A: "tata lampu, gerak, dan musik", B: "tata busana, tempat pentas, dan tata rias", C: "gerak, musik, dan tema", D: "ruang, tempat, dan waktu" }, ans: "C" },
+            { q: "15. Garis yang membatasi lingkup luar bentuk disebut...", opts: { A: "garis batas", B: "garis tepi", C: "kontur", D: "siluet" }, ans: "C" },
+            { q: "16. Tari Karonsih dari Jawa Tengah termasuk kategori tari...", opts: { A: "tari klasik", B: "tari erotik", C: "tari pantomim", D: "tari kepahlawanan" }, ans: "A" },
+            { q: "17. Piano memiliki luas wilayah nada sebanyak...", opts: { A: "5 oktaf", B: "6 oktaf", C: "7 oktaf", D: "8 oktaf" }, ans: "C" },
+            { q: "18. Adanya bentuk-bentuk konsturistik dan bloking warna pada gambar anak menunjukkan karakteristik...", opts: { A: "dekoratif", B: "komik", C: "heroisme", D: "potret" }, ans: "A" },
+            { q: "19. Tipe gambar anak non haptic terlihat sebagai gambar...", opts: { A: "yang mendapat pengaruh dari intellectual motivation", B: "ungkapan harapan anak terhadap harapannya", C: "elemen gambar diulang-ulang", D: "semua elemen gambar terlihat" }, ans: "D" },
+            { q: "20. <br><img src='https://drive.google.com/thumbnail?id=1EsHJzPPROsiu4eSDrI3liq5CyJJW4MmR&sz=w1000' alt='Gambar posisi jari gitar'><br>Dengan posisi jari seperti ini pada permainan gitar adalah akor...", opts: { A: "A minor", B: "C mayor", C: "D minor", D: "D7 mayor" }, ans: "A" },
+            { q: "21. Pelaksanaan pembelajaran seni di SD yang tepat agar potensi siswa berkembang secara optimal yaitu dengan pembelajaran terpadu, artinya...", opts: { A: "dalam pembelajaran terpadu digunakan tema tertentu sebagai pusat minat siswa", B: "dalam pembelajaran terpadu pengaitan topik dengan bidang lain sangat ketat", C: "dalam pemilihan topik pada pembelajaran terpadu bukan dari konsep esensial", D: "dalam pembelajaran terpadu kita tidak dapat memahami konsep sekaligus materi lebih dari satu bidang seni" }, ans: "A" },
+            { q: "22. <br><img src='https://drive.google.com/thumbnail?id=1Wrjl3A_09DMQMbwXA6BupDl1DnaOwerO&sz=w1000' alt='Pola gerak aba-aba'><br>Pola gerak aba-aba yang telah dikembangkan berikut adalah pola birama...", opts: { A: "3/4 nonekspresif", B: "3/4 ekspresi legato", C: "4/4 nonekspresif", D: "4/4 ekspresif legato" }, ans: "D" },
+            { q: "23. Urutan sikap seorang dirigen ketika akan memimpin sebuah pertujukan adalah...", opts: { A: "sikap berdiri, persiapan aba-aba, attack, dan seterusnya sampai release", B: "sikap berdiri, attack, persiapan aba-aba, dan seterusnya sampai release", C: "sikap berdiri, persiapan aba-aba, release, dan seterusnya sampai attack", D: "sikap berdiri, release, persiapan aba-aba, dan seterusnya sampai attack" }, ans: "A" },
+            { q: "24. Karya seni rupa anak dikatakan bersifat ekspresif karena karya mereka umumnya merupakan...", opts: { A: "yang kuat, jujur dan langsung", B: "rasa seni yang realistis", C: "yang terkesan acak-acakan", D: "dengan menggunakan warna-warna kontras" }, ans: "A" },
+            { q: "25. Di bawah ini adalah proses cetak tuang. Bahan yang digunakan adalah bahan cair seperti tanah liat cair, semen cair dan lain-lain. Bahan cair dituangkan dalam cetakan yang sebelumnya diolesi pelumas, kemudian digoyang setelah dingin cetakan dibuka. Teknik tersebut disebut cetak tuang karena...", opts: { A: "bahannya cair", B: "bahannya dituangkan", C: "cetakannya diolesi", D: "bahan cair itu lilin, tanah liat" }, ans: "B" },
+            { q: "26. Pengembangan motif dengan cara memperbesar intervalnya disebut ...", opts: { A: "inversi", B: "augmentasi", C: "diminusi", D: "sekuen" }, ans: "B" },
+            { q: "27. Salah satu cara pembentukan suara yang baik adalah...", opts: { A: "menghirup udara sebanyak mungkin", B: "menggunakan teknik pernafasan dada", C: "otot leher dan kerongkongan diupayakan lemas", D: "bersikap menyanyi yang baik" }, ans: "C" },
+            { q: "28. Salah satu bentuk pemanfaatan teknologi tinggi dapat dijumpai pada...", opts: { A: "pantomim", B: "pertunjukan teater", C: "musik sekolah", D: "sanggar lukis" }, ans: "B" },
+            { q: "29. Berikut ini bukan termasuk jenis rekorder...", opts: { A: "soprano", B: "sopranino", C: "tenor", D: "bass" }, ans: "D" },
+            { q: "30. Ada 5 langkah yang dilakukan untuk membuat karya cetak dengan tekanan tangan. Di bawah ini mana yang merupakan langkah-langkah tersebut (1. Membuat acuan cetak... 2. Acuan diolesi... 3. Tanah liat dimasukkan...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "31. Karakterisatik aksen birama 3/4 adalah...", opts: { A: "arsis-tesis - arsis", B: "tesis-arsis - tesis", C: "arsis-tesis - tesis", D: "tesis-arsis - arsis" }, ans: "D" },
+            { q: "32. Bentuk lagu 'Bintang Kecil' ciptaan Pak Dal memiliki bentuk ....", opts: { A: "ABC", B: "A B", C: "ABA", D: "A" }, ans: "C" },
+            { q: "33. Tjetje Sumantri dari Jawa Barat adalah pencipta tari...", opts: { A: "Bondan Tani", B: "Bhayangkara", C: "Kandagan", D: "Sari Kusuma" }, ans: "C" },
+            { q: "34. Sentuhan halus pada butiran pasir di pantai dalam eksplorasi proses penciptaan tari termasuk rangsang...", opts: { A: "gagasan", B: "visual", C: "auditif", D: "peraba" }, ans: "D" },
+            { q: "35. Pengetahuan yang susunannya tidak teratur dapat diperoleh melalui...", opts: { A: "pengumpulan pengetahuan secara acak", B: "pengumpulan informasi yang bersifat hafalan", C: "pada waktu dan tempat tertentu", D: "di setiap saat" }, ans: "A" },
+            { q: "36. Lagu berikut ini yang berbirama 3/4 adalah...", opts: { A: "Cicak", B: "Garuda Pancasila", C: "Bunga Nusa Indah", D: "Bungaku" }, ans: "D" },
+            { q: "37. Cressendo artinya bunyi berangsur-angsur makin keras, termasuk unsur ekspresi musik tentang...", opts: { A: "tempo", B: "gaya", C: "dinamika", D: "irama" }, ans: "C" },
+            { q: "38. Tahapan dalam berapresiasi terhadap sebuah karya seni adalah...", opts: { A: "surprise - empati - estetis - feeling of content", B: "empati - estetis - surprise - feeling of content", C: "feeling of content - surprise - estetis - empati", D: "surprise - estetis - empati - feeling of content" }, ans: "D" },
+            { q: "39. <br><img src='https://drive.google.com/thumbnail?id=1rOlb1Ab1TNyo_4iI6m1vwLzd4YUup7h6&sz=w1000' alt='Tanda Melodi'><br>Tanda di atas melodi lagu artinya adalah bagian lagu tersebut dinyanyikan dengan...", opts: { A: "suara lembut", B: "suara keras", C: "suara lembut menjadi keras", D: "suara keras menjadi lembut" }, ans: "C" },
+            { q: "40. Pemahaman secara komprehensif akan tujuan Pembelajaran Seni Terpadu yang hendak dicapai diperlukan dalam...", opts: { A: "strategi pembelajaran", B: "pemilihan media", C: "pengawasan materi", D: "menyiasati waktu yang tersedia" }, ans: "A" },
+            { q: "41. Pembelajaran yang memanfaatkan alat permainan sebagai salah satu media pembelajaran, merupakan ciri dari model pembelajaran....", opts: { A: "kreatif", B: "integratif", C: "bermain", D: "CBSA" }, ans: "C" },
+            { q: "42. Orkestra merupakan salah satu bentuk seni pertunjukan musik...", opts: { A: "modern", B: "tradisional", C: "klasik", D: "pendidikan" }, ans: "A" },
+            { q: "43. Contoh hasil belajar dari model pembelajaran terpadu antara musik dan tari adalah ....", opts: { A: "menyanyikan sebuah lagu dengan baik", B: "menari tanpa musik", C: "bergerak membentuk garis lengkung", D: "menari mengikuti irama musik birama 4 dengan tepat" }, ans: "D" },
+            { q: "44. Komponen norma yang berlaku dalam masyarakat pendukung budaya merupakan salah satu komponen yang berpengaruh pada pengembangan pengalaman estetika, merupakan pendapat dari...", opts: { A: "Fogarty", B: "Halod' Francisco", C: "Sawyer", D: "Ross" }, ans: "D" },
+            { q: "45. Kata indah dalam dunia seni adalah identik dengan bagus, bagus yang juga berarti sebagai sesuatu yang memberi...", opts: { A: "kegembiraan hati", B: "ketenangan jiwa", C: "keseimbangan hidup", D: "kepuasan batin manusia" }, ans: "D" },
+            { q: "46. Pengembangan materi pembelajaran yang menggabungkan beberapa mata pelajaran yang mengacu pada sebuah tema adalah pengembangan yang bersifat...", opts: { A: "single", B: "terpadu", C: "vertikal", D: "horizontal" }, ans: "B" },
+            { q: "47. Jenis seni yang satu ini tidak banyak menuntut persyaratan dalam penyelenggaraannya, karena seni ini berfungsi sebagai ....", opts: { A: "tontonan", B: "hiburan", C: "pendidikan", D: "pemujaan" }, ans: "B" },
+            { q: "48. Lagu-lagu populer yang masuk rekaman dan bersifat komersial, seperti pop, dangdut, keroncong, dan melayu merupakan karya musik yang berfungsi sebagai ....", opts: { A: "hiburan", B: "sosial", C: "ritual", D: "pertunjukkan" }, ans: "A" },
+            { q: "49. Model pembelajaran terpadu ini bercirikan setelah tugas selesai dikerjakan oleh siswa dapat dievaluasi dari mata pelajaran yang dipadukan atau dikaitkan ....", opts: { A: "keterpaduan tugas kerja", B: "keterpaduan murni", C: "keterpaduan konsep", D: "keterpaduan tujuan" }, ans: "A" },
+            { q: "50. Karakteristik model pembelajaran integrated subject matter adalah 1) berorientasi pada realita 2) desain pembelajaran tergantung kebijakan 3) pengembangan mata pelajaran vertikal & horizontal", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "51. Menurut Ross fungsi seni dalam pendidikan umum adalah memberi kesempatan anak mengembangkan pengalaman dengan memfasilitasi 1) alat 2) bahan 3) medium", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "52. Pendekatan definitif adalah pendekatan yang digunakan dalam strategi pembelajaran seni yang bertujuan untuk...", opts: { A: "menemukan hakikat seni", B: "mengajarkan teori", C: "pengalaman kreatif", D: "pemahaman karya" }, ans: "B" },
+            { q: "53. Nada F terletak pada garis ke 4 ditentukan dengan kunci...", opts: { A: "A", B: "C", C: "G", D: "F" }, ans: "D" },
+            { q: "54. Perjalanan akor dominant ke tonik adalah... <br><img src='https://drive.google.com/thumbnail?id=1q3xLo1Ql16dUx6PGJ-qHaMY51XDRBQOB&sz=w1000'>", opts: { A: "Gambar A", B: "Gambar B", C: "Gambar C", D: "Gambar D" }, ans: "A" },
+            { q: "55. Berikut ini adalah karakter musik anak umur 6 tahun, kecuali ....", opts: { A: "melodi dan ritme yang sederhana", B: "tidak memberikan kemampuan anak bergerak", C: "kalimat tidak panjang", D: "syair dapat dipahami anak" }, ans: "B" },
+            { q: "56. Berikut adalah salah satu bentuk pemanfaatan teknologi kerajinan dalam penciptaan sebuah karya seni, kecuali...", opts: { A: "kain songket", B: "cenderamata", C: "gerabah", D: "masalah" }, ans: "D" },
+            { q: "57. Ditinjau dari prosesnya cetak tinggi melalui tahap-tahap sebagai berikut (1. menyiapkan alat... 2. alat diberi tinta... 3. ditempel dan ditekan...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "58. Berikut kondisi perkembangan kognitif anak usia SD, kecuali...", opts: { A: "logika terbalik", B: "beraturan", C: "berkomunikasi dengan simbol", D: "memecahkan masalah abstrak secara logis" }, ans: "D" },
+            { q: "59. Guru memberi tugas pada siswa agar melihat suatu benda seni... Dari uraian tersebut, prinsip seni rupa yang paling sesuai dengan aktivitas yang dilakukan siswa adalah....", opts: { A: "keseimbangan", B: "irama", C: "kesatuan", D: "penekanan" }, ans: "C" },
+            { q: "60. Salah satu tarian yang termasuk jenis dramatari adalah...", opts: { A: "Baris", B: "Golek Kayu", C: "Tenun", D: "Malin Kundang" }, ans: "D" },
+            { q: "61. Selain gerak, unsur pokok tari yang penting adalah...", opts: { A: "kekompakan", B: "musik", C: "tenaga", D: "tata rias" }, ans: "B" },
+            { q: "62. Ciri-ciri gambar anak pada masa realisme awal adalah...", opts: { A: "penggambaran objek berupa blocking warna", B: "penggambaran sebuah cerita yang lengkap", C: "perspektif mulai ditampilkan", D: "detail objek mulai diperlihatkan" }, ans: "D" },
+            { q: "63. Seorang anak berkarya seni tanpa memperdulikan kebermaknaan gagasannya untuk orang lain yang penting ia merasa puas. Hal tersebut termasuk dalam pengertian seni sebagai media...", opts: { A: "estetika", B: "emosi", C: "ekspresi", D: "komunikasi" }, ans: "C" },
+            { q: "64. Tema kepahlawanan terdapat di dalam tari...", opts: { A: "Kupu-kupu", B: "Gambir Anom", C: "Lego-lego", D: "Seudati" }, ans: "D" },
+            { q: "65. Birunya laut atau birunya langit adalah sifat warna...", opts: { A: "kabur", B: "maya", C: "nyata", D: "tegas" }, ans: "C" },
+            { q: "66. Ciri tari tradisional klasik adalah...", opts: { A: "ditarikan secara massal", B: "tari yang tidak ditarikan di istana", C: "tari yang pada awalnya ditarikan di luar istana", D: "tari yang ditarikan di kalangan bangsawan" }, ans: "D" },
+            { q: "67. Alat musik yang menyerupai kolintang yang bilah-bilahnya terbuat dari logam yang dimainkan dengan cara dipukul dengan stick, disebut...", opts: { A: "glokenstick", B: "vibraphone", C: "xylophone", D: "marimba" }, ans: "C" },
+            { q: "68. Gambar Superman yang sedang berkelahi dengan musuhnya adalah gambar anak berkarakter...", opts: { A: "komik", B: "heroisme", C: "dekoratif", D: "potret" }, ans: "B" },
+            { q: "69. Gambar anak yang dominan dalam mengungkapkan rasa sehingga tampilannya sangat ekspresif adalah tipe gambar...", opts: { A: "transparan", B: "haptic", C: "willing", D: "x-ray" }, ans: "B" },
+            { q: "70. <br><img src='https://drive.google.com/thumbnail?id=1yhIZvVQi5f4uGym_UFGsxFjGA2L6dYiS&sz=w1000' alt='Gambar Gitar'><br>Bagian 'A' disebut ....", opts: { A: "nut", B: "frets", C: "bridge", D: "fingerboard" }, ans: "A" },
+            { q: "71. Mengembangkan potensi seni anak SD secara optimal cara yang sebaiknya dilakukan guru adalah...", opts: { A: "diberikan kegiatan mencontoh karya seni yang berulang-ulang secara bebas terarah", B: "diberikan latihan berolah seni dan apresiasi sesuai keragaman materi seni di SD", C: "dilatihkan mengapresiasi karya seni rupa, musik dan tari", D: "mengikuti anak berbakat pada kegiatan lomba" }, ans: "B" },
+            { q: "72. Pemimpin kelompok paduan suara atau orkestra disebut...", opts: { A: "artis", B: "vokalis", C: "dirigen", D: "kondektur" }, ans: "C" },
+            { q: "73. Jika seorang dirigen mencondongkan tubuhnya ke depan, berarti ia meminta anggotanya untuk ....", opts: { A: "mengecilkan volume suaranya", B: "berhenti menyanyi", C: "memperpanjang suaranya", D: "mengambil nafas" }, ans: "D" },
+            { q: "74. A menggambar orang dengan struktur cermat... B menggambar orang dengan kepala besar... Manakah pernyataan yang benar...", opts: { A: "Anak A dan B keduanya bertipe visual", B: "Anak A bertipe visual, B bertipe haptic", C: "Anak A bertipe haptic, B bertipe visual", D: "Anak A dan B keduanya bertipe haptic" }, ans: "B" },
+            { q: "75. Berikut adalah tahapan yang harus dilakukan siswa ketika membuat patung Model Kacang Lilin...", opts: { A: "cairan lilin dibentuk model kacang lilin sesuai ukuran", B: "cairan lilin dituangkan ke dalam salah satu kulit kacang kemudian ditutup rapat", C: "lilin diencerkan lalu dituang ke cetakan gips", D: "lilin disusun menjadi model hiasan" }, ans: "B" },
+            { q: "76. Motif lagu biasanya terdiri dari...", opts: { A: "satu ritme dengan 2 nada", B: "satu ritme dengan 1 nada", C: "dua ritme dengan 2 nada", D: "dua ritme dengan 1 nada" }, ans: "A" },
+            { q: "77. Sirkulasi dalam pernafasan saat bernyanyi adalah...", opts: { A: "relaksasi - inhalasi - ekshalasi - suspensi", B: "inhalasi - suspensi - ekshalasi - relaksasi", C: "suspensi - relaksasi - ekshalasi - inhalasi", D: "ekshalasi - relaksasi - inhalasi - suspensi" }, ans: "B" },
+            { q: "78. Salah satu teknologi tinggi yang dimanfaatkan dalam penciptaan karya seni (film) adalah...", opts: { A: "powerpoint", B: "komputer", C: "film", D: "animasi" }, ans: "D" },
+            { q: "79. Jenis rekorder yang ketinggian nada c-nya tidak sama dengan nada f sopran adalah....", opts: { A: "alto", B: "bariton", C: "sopranino", D: "tenor" }, ans: "A" },
+            { q: "80. Dalam kegiatan membentuk teknik mencetak dengan tekanan tangan cara mengerjakannya adalah (1. mengisi cetakan... 2. kedua bagian disatukan... 3. diratakan lalu dikeluarkan...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "81. Perbedaan proses penciptaan musik vokal dengan musik instrumental terletak pada ....", opts: { A: "bentuk lagu", B: "tema lagu", C: "medium", D: "jenis suara" }, ans: "C" },
+            { q: "82. Bentuk binair terdapat pada lagu...", opts: { A: "Bagimu Negeri", B: "Bangun Pemuda", C: "Bengawan Solo", D: "Doremi" }, ans: "A" },
+            { q: "83. Tari yang berhubungan dengan tema menanam padi adalah tari ....", opts: { A: "Rampitan dari Kalimantan Barat", B: "Merak dari Jawa Barat", C: "Cupak dari Lombok", D: "Wiranata dari Bali" }, ans: "A" },
+            { q: "84. Dalam proses produksi 'tari' kegiatan eksplorasi dan improvisasi termasuk tahap....", opts: { A: "konsep garapan", B: "proses garapan", C: "rancangan tema", D: "proses pengamatan objek" }, ans: "B" },
+            { q: "85. Ruang lingkup materi pendidikan seni meliputi ....", opts: { A: "pengetahuan - apresiasi - pengalaman kreatif", B: "pengetahuan - interpretasi - keterampilan", C: "apresiasi - keterampilan - pengetahuan kreatif", D: "interpretasi - apresiasi - keterampilan" }, ans: "A" },
+            { q: "86. Jarak antara dua garis paranada disebut dengan...", opts: { A: "birama", B: "garis birama", C: "garis bantu", D: "spasi" }, ans: "D" },
+            { q: "87. Berikut ini adalah interval besar, kecuali ....", opts: { A: "sekon", B: "sekt", C: "kwart", D: "tert" }, ans: "B" },
+            { q: "88. Puncak tahap pada proses pemahaman apresiasi seseorang terhadap sebuah karya seni adalah...", opts: { A: "empati", B: "estetik", C: "pesona", D: "etis" }, ans: "B" },
+            { q: "89. Sebuah karya seni yang berasal dari bunyi adalah...", opts: { A: "tari", B: "sastra", C: "musik", D: "rupa" }, ans: "C" },
+            { q: "90. Berikut ini merupakan aspek yang perlu diperhatikan guru ketika menggunakan pembelajaran terpadu, kecuali...", opts: { A: "minat siswa", B: "kebutuhan siswa", C: "kemampuan siswa", D: "karakteristik siswa" }, ans: "D" },
+            { q: "91. Pembelajaran yang melibatkan semua aspek perkembangan anak usia dini merupakan salah satu ciri dari model pembelajaran ....", opts: { A: "bermain", B: "kreatif", C: "integratif", D: "CBSA" }, ans: "C" },
+            { q: "92. Berikut ini yang bukan merupakan prinsip dalam formula drama, adalah...", opts: { A: "memainkan", B: "menuliskan", C: "mengabaikan", D: "mengevaluasi" }, ans: "C" },
+            { q: "93. Model pembelajaran terpadu yang menekankan hubungan antara 2 atau lebih bidang studi melalui sebuah tema, disebut...", opts: { A: "model Terkait", B: "model Terjala", C: "model Terhubung", D: "model Terpadu" }, ans: "D" },
+            { q: "94. Keempat komponen yang membangun pengalaman estetika menurut Ross adalah berikut ini, kecuali...", opts: { A: "praktek berkarya seni", B: "medium", C: "nilai/norma masyarakat", D: "materi lingkungan" }, ans: "A" },
+            { q: "95. Jika semua orang selalu ingin hidup selaras dan seimbang, maka manusia perlu...", opts: { A: "melakukan usaha terus-menerus", B: "bekerja untuk dirinya sendiri", C: "melakukan usaha yang kreatif", D: "bekerja seperlunya" }, ans: "A" },
+            { q: "96. Siswa akan memperoleh pengetahuan yang sinergis dari berbagai bidang seni yang diajarkan secara berangkai. Hal ini akan terjadi bila guru mengembangkan materi secara...", opts: { A: "horizontal", B: "vertikal", C: "majemuk", D: "tematis" }, ans: "A" },
+            { q: "97. Dengan olah Seni Musik Tari dan Drama anak terlatih berpikir kreatif karena seni berfungsi sebagai media...", opts: { A: "ekspresi", B: "bermain", C: "pendidikan", D: "komunikasi" }, ans: "C" },
+            { q: "98. Menurut fungsinya, musik hiburan termasuk jenis musik...", opts: { A: "sakral", B: "religi", C: "ritual", D: "duniawi" }, ans: "D" },
+            { q: "99. Dalam model pembelajaran terpadu yang satu ini, guru akan mengajarkan suatu keterampilan teknis dari salah satu bidang pelajaran yang dapat diselesaikan oleh pelajaran lain....", opts: { A: "keterpaduan tujuan", B: "keterpaduan konsep", C: "keterpaduan mata pelajaran", D: "keterpaduan murni" }, ans: "C" },
+            { q: "100. Pengertian terpadu dalam pembelajaran terpadu dimaksudkan menghimpun atau merumuskan kegiatan belajar-mengajar... merupakan pengertian dari...", opts: { A: "terpadu dalam model pembelajaran fragmented", B: "terpadu dalam model pembelajaran integrated", C: "terpadu dalam model pembelajaran connected", D: "terpadu dalam model pembelajaran webbed" }, ans: "B" },
+            { q: "101. Jenis kurikulum ini bertujuan mengarahkan siswa mampu memiliki pengetahuan akademis di bidangnya... Kurikulum yang dimaksud adalah...", opts: { A: "practical curriculum", B: "academic curriculum", C: "cultural curriculum", D: "general curriculum" }, ans: "B" },
+            { q: "102. Pendekatan yang digunakan untuk memperoleh pemahaman seni melalui strategi studi mandiri adalah pendekatan...", opts: { A: "definitif", B: "partisipatif", C: "eksploratif", D: "tematis" }, ans: "C" },
+            { q: "103. Yang dimaksud dengan lagu berbirama gantung adalah lagu yang...", opts: { A: "berbirama 3/4", B: "dimulai tidak pada ketukan pertama", C: "bersifat sedih", D: "digunakan untuk paduan suara" }, ans: "B" },
+            { q: "104. Perjalanan akor subdominan ke dominan adalah... <br><img src='https://drive.google.com/thumbnail?id=1y67TdSIdJ8nFE5TA5y3wakWiDRNzdrnc&sz=w1000'>", opts: { A: "Gambar A", B: "Gambar B", C: "Gambar C", D: "Gambar D" }, ans: "D" },
+            { q: "105. Berikut ini karakteristik suara anak 6-7 tahun, kecuali...", opts: { A: "menyanyikan kalimat-kalimat pendek", B: "memahami tinggi dan rendah nada", C: "batas suara a-d", D: "memiliki suara ringan dan tinggi" }, ans: "C" },
+            { q: "106. Salah satu yang termasuk prinsip-prinsip dalam memanfaatkan teknologi pengelolaan pada penciptaan karya seni...", opts: { A: "kecepatan", B: "ekonomi", C: "higienis", D: "kepandaian" }, ans: "B" },
+            { q: "107. Tahap-tahap mencetak lipatan adalah (1. menyiapkan kertas... 2. dilipat... 3. ditutup lalu buka...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "B" },
+            { q: "108. Kemampuan anak mencerna informasi yang berasal dari luar dirinya yang dihubungkan dengan pengetahuan yang sudah dimiliki adalah kemampuan ....", opts: { A: "estetika", B: "intelektual", C: "apresiasi", D: "sosial" }, ans: "B" },
+            { q: "109. Agar tidak terjadi pemahaman yang berbeda-beda dalam menilai karya seni rupa, pengamat/penilai harus memahami prinsip...", opts: { A: "apresiasi", B: "karya seni", C: "penilaian", D: "seni rupa" }, ans: "C" },
+            { q: "110. Tarian berikut yang termasuk tari representatif adalah...", opts: { A: "Kijang", B: "Malam", C: "Galau", D: "Hitam" }, ans: "A" },
+            { q: "111. Arena yang dilalui penari saat melakukan gerak disebut....", opts: { A: "ruang yang diciptakan oleh penari", B: "ruang pentas", C: "ruang penari", D: "ruang tari" }, ans: "D" },
+            { q: "112. Penggambaran objek berupa bagan banyak dibuat oleh anak pada masa...", opts: { A: "realisme semu", B: "coreng moreng", C: "bagan", D: "prabagan" }, ans: "C" },
+            { q: "113. Seorang guru dalam pembelajaran melukis memberikan kesempatan kepada seorang anak untuk berkarya dengan teknik tiup menggunakan sedotan agar mereka senang. Guru telah menerapkan fungsi pendidikan seni sebagai media...", opts: { A: "ekspresi", B: "kreasi", C: "bermain", D: "komunikasi" }, ans: "C" },
+            { q: "114. Desain yang memberi kesan senang, halus, dan lembut yang ditimbulkan oleh postur penari tanpa menggunakan garis kontras, adalah desain...", opts: { A: "kontras", B: "murni", C: "horizontal", D: "vertikal" }, ans: "B" },
+            { q: "115. Secara konseptual bintik merupakan unsur yang berperan sebagai...", opts: { A: "arah gerakan", B: "pusat perhatian", C: "tanda awal", D: "ujung garis" }, ans: "B" },
+            { q: "116. Fungsi tari antara lain untuk hiburan yang bersifat ringan dan ditata secara longgar atau bebas, contohnya ....", opts: { A: "tari Serampang Dua Belas dari Sumatra Barat", B: "tari Caka-Lele dari Irian", C: "tari Tor-Tor dari Sumatra Utara", D: "tari Pendet dari Bali" }, ans: "A" },
+            { q: "117. Marimba termasuk alat musik...", opts: { A: "idiophone", B: "membranophone", C: "cordophone", D: "aerophone" }, ans: "A" },
+            { q: "118. Seorang anak sering menggambarkan ibu gurunya. Hal ini menunjukkan gambar tersebut berkarakteristik....", opts: { A: "dekoratif", B: "heroisme", C: "komik", D: "potret" }, ans: "D" },
+            { q: "119. Gambar anak yang memperlihatkan impian atau cita-citanya termasuk tipe gambar .....", opts: { A: "haptic", B: "non-haptic", C: "willing", D: "x-ray" }, ans: "B" },
+            { q: "120. <br><img src='https://drive.google.com/thumbnail?id=14ei6S7K10uTG_ZWHBVvtHf4-XjiV_h_E&sz=w1000' alt='Gambar Gitar'><br>Bagian 'D' disebut ....", opts: { A: "nut", B: "frets", C: "bridge", D: "fingerboard" }, ans: "C" },
+            { q: "121. Kegiatan di bawah ini yang menunjukkan fungsi seni sebagai media pengembangan bakat adalah...", opts: { A: "melatih anak berapresiasi dan berekspresi dalam salah satu bidang seni", B: "melatih anak berekspresi dan bereksplorasi dalam seluruh bidang seni", C: "melatih keterampilan dan apresiasi anak dalam seluruh bidang seni", D: "melatih keterampilan dan ekspresi anak dalam seluruh bidang seni" }, ans: "A" },
+            { q: "122. Salah satu yang harus dimiliki seorang dirigen, adalah...", opts: { A: "menguasai cara latihan yang efektif", B: "memiliki daya imajinasi yang kuat", C: "memiliki sifat kepemimpinan", D: "memiliki pengetahuan musik yang baik" }, ans: "C" },
+            { q: "123. Gerakan improvisasi tari yang dirangsang oleh suara-suara yang ada di sekitar kita, disebut improvisasi melalui ....", opts: { A: "properti", B: "suara lingkungan", C: "suara musik", D: "bermain peran" }, ans: "B" },
+            { q: "124. Karya seni rupa anak dikatakan mempunyai sifat dinamis berdasarkan ciri-ciri berikut ini, kecuali...", opts: { A: "warna kontras", B: "ungkapan yang kuat", C: "warna mencolok", D: "tentang suatu yang bergerak" }, ans: "D" },
+            { q: "125. Langkah-langkah membentuk dengan teknik lempeng adalah (1. adonan dipipihkan... 2. irisan disambung... 3. dengan cara dipijit...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "126. Ambitus suara anak SD adalah...", opts: { A: "c' - f''", B: "a - d''", C: "c' - c''", D: "a - f'" }, ans: "B" },
+            { q: "127. Berikut termasuk cara untuk membentuk resonansi, kecuali ....", opts: { A: "tidak menyentuh gigi bawah", B: "ruang seluas mungkin pada rongga mulut", C: "rahang bawah digerakan dengan luwes", D: "teknik pernafasan dada" }, ans: "D" },
+            { q: "128. Salah satu bentuk teknologi sederhana berenergi alam adalah...", opts: { A: "sepeda", B: "jam", C: "kincir angin", D: "drum (alat musik)" }, ans: "C" },
+            { q: "129. Sistem penalaan Nontransposisi ada pada recorder jenis...", opts: { A: "sopran - alto", B: "sopran - bariton", C: "sopran - tenor", D: "sopran - sopranino" }, ans: "A" },
+            { q: "130. Dalam kegiatan membentuk dengan proses cetak tuang cara mengerjakannya adalah (1. mengisi cetakan... 2. disatukan dan diikat... 3. dilepas...)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "D" },
+            { q: "131. Karakteristik aksen birama 2/4 adalah...", opts: { A: "tesis - arsis", B: "tesis - tesis", C: "arsis - arsis", D: "arsis - tesis" }, ans: "A" },
+            { q: "132. Lagu 'Burung Kutilang' diciptakan oleh...", opts: { A: "Pak Dal", B: "A.T. Mahmud", C: "Ibu Sud", D: "Pak Kasur" }, ans: "B" },
+            { q: "133. Tari Rampitan dari Kalimantan Barat adalah tari yang bertema...", opts: { A: "binatang", B: "tanam padi", C: "kepahlawanan", D: "upacara adat" }, ans: "B" },
+            { q: "134. Ada empat tahapan/urutan proses produksi tari. Urutan itu adalah...", opts: { A: "eksplorasi, improvisasi, evaluasi, dan forming", B: "eksplorasi, improvisasi, forming, dan evaluasi", C: "evaluasi, forming, improvisasi, dan eksplorasi", D: "eksplorasi, evaluasi, forming, dan improvisasi" }, ans: "B" },
+            { q: "135. Pengetahuan kognisi dan sikap apresiatif selalu terlihat dalam aktivitas...", opts: { A: "belajar seni", B: "memproduksi karya seni", C: "mengamati karya", D: "mengkritisi karya" }, ans: "D" },
+            { q: "136. Pada birama 4/4, terdapat perbedaan tekanan pada ketukan pertama dari ketukan dua, tiga, dan empat yaitu...", opts: { A: "ketukan 1 lemah, ketukan 2, 3, 4 kuat", B: "ketukan 1 lemah, ketukan 2, 3, 4 lemah", C: "ketukan 1 kuat, ketukan 2, 3, 4 lemah", D: "ketukan 1 kuat, ketukan 2, 3, 4 kuat" }, ans: "A" },
+            { q: "137. Jarak nada C ke nada D disebut interval...", opts: { A: "prim", B: "prim murni", C: "sekon", D: "kuart" }, ans: "C" },
+            { q: "138. Kemampuan menangkap dimensi rasa dari sebuah karya seni merupakan tahap...", opts: { A: "feeling of content", B: "etis", C: "surprise", D: "estetik" }, ans: "A" },
+            { q: "139. Berikut ini contoh penampilan musik vokal, kecuali...", opts: { A: "paduan suara", B: "duet", C: "solo", D: "ansambel" }, ans: "D" },
+            { q: "140. Pembelajaran Seni Terpadu bercirikan memadukan topik dan tema dan beberapa mata pelajaran berdasarkan...", opts: { A: "minat dan kebutuhan siswa", B: "waktu dan materi pelajaran", C: "sifat dan fungsi mata pelajaran", D: "kemampuan dan kebutuhan siswa" }, ans: "A" },
+            { q: "141. Jenis dan ruang lingkup pembelajaran seni di Sekolah Dasar meliputi bidang-bidang berikut, kecuali...", opts: { A: "pengetahuan seni", B: "apresiasi seni", C: "kritik sastra", D: "produksi seni" }, ans: "C" },
+            { q: "142. Tari 'Oleg Tampulilingan' termasuk tari...", opts: { A: "tunggal", B: "pasangan", C: "kelompok", D: "massal" }, ans: "A" },
+            { q: "143. Model Terkait dalam pembelajaran kerajinan tangan dan kesenian menekankan pada...", opts: { A: "hubungan antarpokok/subpokok bahasan", B: "hubungan antarbidang studi", C: "penggunaan metode pembelajaran", D: "penggunaan media pembelajaran" }, ans: "A" },
+            { q: "144. Pernyataan di bawah ini yang tidak termasuk cakupan kurikulum adalah...", opts: { A: "humanistik", B: "praktis", C: "akademis", D: "keterampilan" }, ans: "D" },
+            { q: "145. Musik seni ialah musik yang diciptakan untuk...", opts: { A: "memuaskan pendengar", B: "untuk memuja Tuhan", C: "upacara perkawinan", D: "keindahan musik itu sendiri" }, ans: "D" },
+            { q: "146. Pembelajaran terpadu yang bertema adalah pembelajaran terpadu yang bersifat...", opts: { A: "tematis", B: "vertikal", C: "horizontal", D: "majemuk" }, ans: "A" },
+            { q: "147. Kegiatan memecahkan masalah pada waktu berolah seni menunjukkan bahwa seni memiliki fungsi sebagai media dalam...", opts: { A: "bermain", B: "komunikasi", C: "pendidikan", D: "ekspresi" }, ans: "C" },
+            { q: "148. Fungsi tari Serampang Dua Belas dari Sumatra Barat yang bersifat ringan dan gembira sebagai tari...", opts: { A: "upacara", B: "hiburan", C: "tontonan", D: "pertunjukan" }, ans: "B" },
+            { q: "149. Pembelajaran terpadu kelas adalah upaya untuk mengatasi keterbatasan .... (1. ruang 2. guru 3. waktu)", opts: { A: "1 dan 2 benar", B: "1 dan 3 benar", C: "2 dan 3 benar", D: "1, 2, dan 3 benar" }, ans: "B" },
+            { q: "150. Guru dalam membuat pengembangan materi pelajaran agar mudah mengemas bahan pelajarannya dalam pembelajaran terpadu, perlu memperhatikan aspek-aspek berikut, kecuali...", opts: { A: "kebutuhan dasar", B: "kemampuan siswa", C: "karakteristik siswa", D: "usia siswa" }, ans: "D" }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        const domQuestion = document.getElementById('question');
+        const domOptions = document.getElementById('options');
+        const domFeedback = document.getElementById('feedback');
+        const domTracker = document.getElementById('tracker');
+        const domScore = document.getElementById('score');
+        
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnCheck = document.getElementById('btn-check');
+
+        function loadQuestion() {
+            const data = quizData[currentIndex];
+            // Menggunakan innerHTML agar tag <img ...> di dalam soal bisa terbaca sebagai gambar, bukan teks biasa
+            domQuestion.innerHTML = data.q; 
+            domTracker.textContent = `Soal ${currentIndex + 1} dari ${quizData.length}`;
+            domScore.textContent = `Skor: ${score}`;
+            
+            domOptions.innerHTML = '';
+            domFeedback.className = 'feedback-box';
+            domFeedback.innerHTML = '';
+
+            const answered = userAnswers[currentIndex];
+
+            for (const [key, val] of Object.entries(data.opts)) {
+                const label = document.createElement('label');
+                label.className = 'option-item';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'answer_opt';
+                radio.value = key;
+                
+                if (answered) {
+                    radio.disabled = true;
+                    if (key === data.ans) {
+                        label.classList.add('correct');
+                    } else if (key === answered && answered !== data.ans) {
+                        label.classList.add('wrong');
+                    }
+                    radio.checked = (key === answered);
+                }
+
+                const span = document.createElement('span');
+                span.innerHTML = `<span class="option-letter">${key}.</span> ${val}`;
+                
+                label.appendChild(radio);
+                label.appendChild(span);
+                domOptions.appendChild(label);
+            }
+
+            if (answered) {
+                showResult(answered === data.ans);
+                btnCheck.disabled = true;
+            } else {
+                btnCheck.disabled = false;
+            }
+        }
+
+        function verifyAnswer() {
+            const checked = document.querySelector('input[name="answer_opt"]:checked');
+            if (!checked) {
+                alert('Pilih salah satu jawaban terlebih dahulu!');
+                return;
+            }
+
+            const data = quizData[currentIndex];
+            const answer = checked.value;
+            const isCorrect = (answer === data.ans);
+
+            userAnswers[currentIndex] = answer;
+
+            if (isCorrect) score += 10; 
+            
+            loadQuestion(); 
+            updateNavButtons();
+        }
+
+        function showResult(isCorrect) {
+            domFeedback.classList.add('show');
+            if (isCorrect) {
+                domFeedback.innerHTML = '✨ Jawaban Anda Benar!';
+                domFeedback.className = 'feedback-box show success';
+            } else {
+                const data = quizData[currentIndex];
+                domFeedback.innerHTML = `❌ Jawaban Salah. Kunci jawaban yang tepat adalah: <strong>${data.ans}</strong>`;
+                domFeedback.className = 'feedback-box show error';
+            }
+        }
+
+        function updateNavButtons() {
+            btnPrev.disabled = currentIndex === 0;
+            if (currentIndex === quizData.length - 1) {
+                btnNext.textContent = 'Selesai Kuis';
+            } else {
+                btnNext.textContent = 'Selanjutnya';
+            }
+        }
+
+        btnCheck.addEventListener('click', verifyAnswer);
+
+        btnNext.addEventListener('click', () => {
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                loadQuestion();
+                updateNavButtons();
+            } else {
+                alert(`Kuis Selesai! Skor Akhir Anda adalah: ${score} dari Total ${quizData.length * 10}`);
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadQuestion();
+                updateNavButtons();
+            }
+        });
+
+        loadQuestion();
+        updateNavButtons();
+    </script>
+</body>
+</html>
