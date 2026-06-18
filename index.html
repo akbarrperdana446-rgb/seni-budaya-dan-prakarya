@@ -237,7 +237,7 @@
         </div>
         
         <div class="status-bar">
-            <span id="tracker">Soal 1 dari ...</span>
+            <span id="tracker">Soal 1 dari 150</span>
             <span id="score">Skor: 0</span>
         </div>
 
@@ -255,7 +255,7 @@
     </div>
 
     <script>
-        // Database Soal dari dokumen PDF SPGK4306.
+        // Database 150 Soal Lengkap
         const quizData = [
             { q: "1. Kurikulum yang satu ini dirancang untuk mengembangkan kepribadian siswa sesuai dengan harkat dan martabat kemanusiaannya. Selain itu kurikulum ini lebih menekankan pada pembangunan watak dan kepribadian siswa sebagai manusia sosial dan beragama. Kurikulum yang dimaksud adalah...", opts: { A: "practical curriculum", B: "academic curriculum", C: "cultural curriculum", D: "general curriculum" }, ans: "C" },
             { q: "2. Pendekatan yang digunakan sebagai strategi dalam pembelajaran teori atau apresiasi yang bersifat kognitif adalah...", opts: { A: "Definitif", B: "Partisipatif", C: "Eksploratif", D: "Tematis" }, ans: "A" },
@@ -411,7 +411,7 @@
 
         let currentIndex = 0;
         let score = 0;
-        let userAnswers = new Array(quizData.length).fill(null);
+        let userAnswers = [];
 
         const domQuestion = document.getElementById('question');
         const domOptions = document.getElementById('options');
@@ -423,10 +423,32 @@
         const btnNext = document.getElementById('btn-next');
         const btnCheck = document.getElementById('btn-check');
 
+        // Fungsi untuk mengacak urutan elemen dalam array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Fungsi untuk memulai atau mengulang kuis dari awal
+        function initQuiz() {
+            currentIndex = 0;
+            score = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            shuffleArray(quizData); // Mengacak soal setiap kali kuis diulang
+            loadQuestion();
+            updateNavButtons();
+        }
+
         function loadQuestion() {
             const data = quizData[currentIndex];
-            // Menggunakan innerHTML agar tag <img ...> di dalam soal bisa terbaca sebagai gambar, bukan teks biasa
-            domQuestion.innerHTML = data.q; 
+            
+            // Menghapus nomor asli dari string (misal: "1. ", "45. ") agar penomoran
+            // di layar menyesuaikan urutan yang sudah diacak (1, 2, 3... dst).
+            const cleanQuestionText = data.q.replace(/^\d+\.\s*/, '');
+            
+            domQuestion.innerHTML = `${currentIndex + 1}. ${cleanQuestionText}`;
             domTracker.textContent = `Soal ${currentIndex + 1} dari ${quizData.length}`;
             domScore.textContent = `Skor: ${score}`;
             
@@ -519,7 +541,13 @@
                 loadQuestion();
                 updateNavButtons();
             } else {
+                // Notifikasi penyelesaian
                 alert(`Kuis Selesai! Skor Akhir Anda adalah: ${score} dari Total ${quizData.length * 10}`);
+                
+                // Dialog konfirmasi untuk mengulang dengan urutan acak yang baru
+                if(confirm("Apakah Anda ingin mengerjakan ulang kuis dengan urutan soal yang baru?")) {
+                    initQuiz();
+                }
             }
         });
 
@@ -531,8 +559,8 @@
             }
         });
 
-        loadQuestion();
-        updateNavButtons();
+        // Inisialisasi Kuis saat memuat pertama kali
+        initQuiz();
     </script>
 </body>
 </html>
